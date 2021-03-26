@@ -1,4 +1,4 @@
-# Lab-tekton
+# Lab-tekton-simple
 
 git clone https://github.com/lcolagio/lab-tekton.git
 
