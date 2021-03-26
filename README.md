@@ -4,18 +4,24 @@ git clone https://github.com/lcolagio/lab-tekton.git
 
 cd lab-tekton
 
-# Init Pipeline
+# Init via Manifest K8S
+
+oc delete project devsecops
 
 oc new-project devsecops
 
-oc apply -f pipeline/task-apply-manifests.yaml
+oc apply -f pipeline/base/task-apply-manifests.yaml
 
-oc apply -f pipeline/pipeline-build-and-deploy.yaml
+oc apply -f pipeline/base/pipeline-build-and-deploy.yaml
 
-# Execute pipeline
+# Init use case via kustomize
 
-tkn pipeline start build-and-deploy -w name=shared-workspace,volumeClaimTemplateFile=pipeline/pvc-pipeline.yaml
+oc delete project devsecops
 
+oc new-project devsecops
 
+oc apply -k pipeline
 
+# Execute Pipeline
 
+tkn pipeline start build-and-deploy -w name=shared-workspace,volumeClaimTemplateFile=pipeline/base/pvc-pipeline.yaml
