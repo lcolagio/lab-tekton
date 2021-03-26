@@ -10,9 +10,9 @@ oc delete project devsecops
 
 oc new-project devsecops
 
-oc apply -f pipeline/base/task-apply-manifests.yaml
+oc apply -f pipeline-simple/base/task-apply-manifests.yaml
 
-oc apply -f pipeline/base/pipeline-build-and-deploy.yaml
+oc apply -f pipeline-simple/base/pipeline-build-and-deploy.yaml
 
 # Init use case via kustomize
 
@@ -24,4 +24,4 @@ oc apply -k pipeline
 
 # Execute Pipeline
 
-tkn pipeline start build-and-deploy -w name=shared-workspace,volumeClaimTemplateFile=pipeline/base/pvc-pipeline.yaml
+tkn pipeline start build-and-deploy -w name=shared-workspace,volumeClaimTemplateFile=pipeline-simple/base/pvc-pipeline.yaml
