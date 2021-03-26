@@ -1,0 +1,158 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-and-deploy
+  namespace: devsecops
+spec:
+  workspaces:
+  - name: shared-workspace
+  tasks:
+
+  - name: git-clone-fe
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+    params:
+      - name: url
+        value: 'https://github.com/mancubus77/devsecops-demo-fe.git'
+      - name: submodules
+        value: 'true'
+      - name: depth
+        value: '1'
+      - name: sslVerify
+        value: 'true'
+      - name: deleteExisting
+        value: 'true'
+      - name: verbose
+        value: 'true'
+      - name: subdirectory
+        value: fe
+
+  - name: kube-linter-fe
+    taskRef:
+      name: kube-linter
+    params:
+    - name: subdirectory
+      value: fe/kubernetes/
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+      - git-clone-fe
+
+  - name: nodejs-scanner
+    taskRef:
+      name: nodejs-scan
+    params:
+    - name: subdirectory
+      value: fe
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+      - git-clone-fe
+
+  - name: build-scan-fe
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    taskRef:
+      name: build-and-scan
+    params:
+      - name: out-image-name
+        value: frontend
+      - name: CONTEXT
+        value: app/
+      - name: subdirectory
+        value: fe/
+    runAfter:
+      - nodejs-scanner
+      - kube-linter-fe
+
+  - name: k8s-deploy-fe
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    params:
+      - name: subdirectory
+        value: fe
+    taskRef:
+      name: apply-manifests
+    runAfter:
+      - build-scan-fe
+
+  - name: git-clone-be
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+    params:
+      - name: url
+        value: 'https://github.com/mancubus77/devsecops-demo-be.git'
+      - name: submodules
+        value: 'true'
+      - name: depth
+        value: '1'
+      - name: sslVerify
+        value: 'false'
+      - name: deleteExisting
+        value: 'true'
+      - name: verbose
+        value: 'true'
+      - name: revision
+        value: 'clear'
+
+  - name: python-scanner
+    taskRef:
+      name: bandit-scan
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+      - git-clone-be
+
+  - name: kube-linter-be
+    taskRef:
+      name: kube-linter
+    params:
+    - name: subdirectory
+      value: fe/kubernetes/
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+      - git-clone-be
+
+
+  - name: build-scan-be
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    taskRef:
+      name: build-and-scan
+    params:
+      - name: out-image-name
+        value: backend
+      - name: CONTEXT
+        value: app/
+      - name: TLSVERIFY
+        value: 'false'
+    runAfter:
+      - python-scanner
+      - kube-linter-be
+
+  - name: k8s-deploy-be
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    taskRef:
+      name: apply-manifests
+    runAfter:
+      - build-scan-be
+
+
