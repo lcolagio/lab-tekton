@@ -90,6 +90,8 @@ spec:
         value: 'true'
       - name: verbose
         value: 'true'
+      - name: subdirectory
+        value: be
 
   - name: buildah-be
     workspaces:
@@ -110,7 +112,7 @@ spec:
       - name: DOCKERFILE
         value: ./Dockerfile
       - name: CONTEXT
-        value: app/
+        value: be/app/
       - name: TLSVERIFY
         value: 'false'
       - name: FORMAT
