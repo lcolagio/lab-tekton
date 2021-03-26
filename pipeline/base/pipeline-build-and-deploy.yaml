@@ -17,7 +17,9 @@ spec:
       workspace: shared-workspace
     params:
       - name: url
-        value: 'https://github.com/mancubus77/devsecops-demo-fe.git'
+#       value: 'https://github.com/mancubus77/devsecops-demo-fe.git'
+        value: 'https://github.com/lcolagio/lab-tekton-app-fe.git'
+
       - name: submodules
         value: 'true'
       - name: depth
@@ -79,7 +81,7 @@ spec:
       workspace: shared-workspace
     params:
       - name: url
-        value: 'https://github.com/mancubus77/devsecops-demo-be.git'
+        value: 'https://github.com/lcolagio/lab-tekton-app-be.git'
       - name: submodules
         value: 'true'
       - name: depth
