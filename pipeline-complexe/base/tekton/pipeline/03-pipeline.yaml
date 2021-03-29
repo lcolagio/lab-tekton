@@ -141,7 +141,7 @@ spec:
       - name: out-image-name
         value: backend
       - name: CONTEXT
-        value: app/
+        value: be/app/
       - name: TLSVERIFY
         value: 'false'
     runAfter:
