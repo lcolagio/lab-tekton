@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: build-and-deploy
+  name: build-and-deploy-complexe
   namespace: devsecops
 spec:
   workspaces:
@@ -106,7 +106,9 @@ spec:
         value: 'true'
       - name: revision
         value: 'clear'
-
+      - name: subdirectory
+        value: be
+        
   - name: python-scanner
     taskRef:
       name: bandit-scan
